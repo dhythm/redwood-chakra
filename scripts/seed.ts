@@ -1,13 +1,15 @@
-import type { Prisma } from '@prisma/client'
 import { Domain, Action } from '@prisma/client'
 import { db } from 'api/src/lib/db'
+import CryptoJS from 'crypto-js'
 
 export default async () => {
   try {
     const promises: any[] = []
     for (const domain of Object.keys(Domain) as (keyof typeof Domain)[]) {
       for (const action of Object.keys(Action) as (keyof typeof Action)[]) {
-        const name = `${domain}${action.toUpperCase()}`
+        const name = `${domain}${
+          action.charAt(0).toUpperCase() + action.slice(1)
+        }`
         if (!(await db.ability.findUnique({ where: { name } }))) {
           promises.push(
             db.ability.create({
@@ -83,8 +85,37 @@ export default async () => {
       },
       update: {},
     })
+
+    const [hashedPassword, salt] = _hashPassword('twixrox')
+    await db.user.upsert({
+      where: {
+        organizationCode_email: {
+          organizationCode: '0000',
+          email: 'kody@test.redwoodjs.com',
+        },
+      },
+      create: {
+        organizationCode: '0000',
+        name: 'kody',
+        email: 'kody@test.redwoodjs.com',
+        hashedPassword,
+        salt,
+      },
+      update: {},
+    })
   } catch (error) {
     console.warn('Please define your seed data.')
     console.error(error)
   }
+}
+
+// https://github.com/redwoodjs/redwood/issues/5793
+// https://github.com/redwoodjs/redwood/blob/main/packages/api/src/functions/dbAuth/DbAuthHandler.ts#L1288
+const _hashPassword = (text: string, salt?: string) => {
+  const useSalt = salt || CryptoJS.lib.WordArray.random(128 / 8).toString()
+
+  return [
+    CryptoJS.PBKDF2(text, useSalt, { keySize: 256 / 32 }).toString(),
+    useSalt,
+  ]
 }

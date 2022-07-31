@@ -1,8 +1,8 @@
-import { db } from 'src/lib/db'
 import { DbAuthHandler } from '@redwoodjs/api'
 
-export const handler = async (event, context) => {
+import { db } from 'src/lib/db'
 
+export const handler = async (event, context) => {
   const forgotPasswordOptions = {
     // handler() is invoked after verifying that a user was found with the given
     // username. This is where you can send the user an email with a link to
@@ -133,6 +133,8 @@ export const handler = async (event, context) => {
     // something like `id` or `userId` or even `email`)
     authFields: {
       id: 'id',
+      // TODO: add organizationCode to authFields as an authentication column
+      // organizationCode: 'organizationCode',
       username: 'email',
       hashedPassword: 'hashedPassword',
       salt: 'salt',
