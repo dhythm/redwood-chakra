@@ -16,5 +16,21 @@ yarn rw g dbAuth
 ```sh
 docker-compose run -p 5432:5432 -d postgres
 yarn redwood prisma db seed
-docker exec -it 34ad217295f9 psql -U postgres
+docker exec -it <CONTAINER_ID> psql -U postgres
+```
+
+### Run App
+```sh
+yarn redwood dev
+```
+
+## Development
+### Create a page
+```sh
+yarn redwood generate page home /
+```
+
+### Create a layout
+```sh
+yarn redwood g layout main
 ```
