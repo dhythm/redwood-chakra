@@ -89,10 +89,7 @@ export default async () => {
     const [hashedPassword, salt] = _hashPassword('twixrox')
     await db.user.upsert({
       where: {
-        organizationCode_email: {
-          organizationCode: '0000',
-          email: 'kody@test.redwoodjs.com',
-        },
+        email: 'kody@test.redwoodjs.com',
       },
       create: {
         organizationCode: '0000',

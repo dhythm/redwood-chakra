@@ -80,7 +80,7 @@ CREATE UNIQUE INDEX "Role_organizationCode_name_key" ON "Role"("organizationCode
 CREATE UNIQUE INDEX "Organization_organizationCode_key" ON "Organization"("organizationCode");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_organizationCode_email_key" ON "User"("organizationCode", "email");
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_AbilityToRole_AB_unique" ON "_AbilityToRole"("A", "B");

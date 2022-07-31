@@ -69,7 +69,7 @@ model User {
   Role                Role?        @relation(fields: [roleId], references: [id])
   roleId              String?
 
-  @@unique([organizationCode, email])
+  @@unique([email])
 }
 
 enum Action {
