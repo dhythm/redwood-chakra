@@ -1,38 +1,88 @@
 import type { Prisma } from '@prisma/client'
+import { Domain, Action } from '@prisma/client'
 import { db } from 'api/src/lib/db'
 
 export default async () => {
   try {
-    //
-    // Manually seed via `yarn rw prisma db seed`
-    // Seeds automatically with `yarn rw prisma migrate dev` and `yarn rw prisma migrate reset`
-    //
-    // Update "const data = []" to match your data model and seeding needs
-    //
-    const data: Prisma.UserExampleCreateArgs['data'][] = [
-      // To try this example data with the UserExample model in schema.prisma,
-      // uncomment the lines below and run 'yarn rw prisma migrate dev'
-      //
-      // { name: 'alice', email: 'alice@example.com' },
-      // { name: 'mark', email: 'mark@example.com' },
-      // { name: 'jackie', email: 'jackie@example.com' },
-      // { name: 'bob', email: 'bob@example.com' },
-    ]
-    console.log(
-      "\nUsing the default './scripts/seed.{js,ts}' template\nEdit the file to add seed data\n"
-    )
+    const promises: any[] = []
+    for (const domain of Object.keys(Domain) as (keyof typeof Domain)[]) {
+      for (const action of Object.keys(Action) as (keyof typeof Action)[]) {
+        const name = `${domain}${action.toUpperCase()}`
+        if (!(await db.ability.findUnique({ where: { name } }))) {
+          promises.push(
+            db.ability.create({
+              data: {
+                name,
+                domain,
+                action,
+              },
+            })
+          )
+        }
+      }
+    }
+    await Promise.allSettled(promises)
 
-    // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
-    // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
-    Promise.all(
-      //
-      // Change to match your data model and seeding needs
-      //
-      data.map(async (data: Prisma.UserExampleCreateArgs['data']) => {
-        const record = await db.userExample.create({ data })
-        console.log(record)
-      })
-    )
+    await db.organization.upsert({
+      where: {
+        organizationCode: '0000',
+      },
+      create: {
+        organizationCode: '0000',
+        name: 'sample organization',
+      },
+      update: {},
+    })
+
+    const queryAbilities = await db.ability.findMany({
+      where: {
+        action: 'query',
+      },
+      select: {
+        id: true,
+      },
+    })
+    await db.role.upsert({
+      where: {
+        organizationCode_name: {
+          organizationCode: '0000',
+          name: 'viewer',
+        },
+      },
+      create: {
+        organizationCode: '0000',
+        name: 'viewer',
+        abilities: {
+          connect: queryAbilities,
+        },
+      },
+      update: {},
+    })
+
+    const mutateAbilities = await db.ability.findMany({
+      where: {
+        action: 'mutate',
+      },
+      select: {
+        id: true,
+      },
+    })
+    await db.role.upsert({
+      where: {
+        organizationCode_name: {
+          organizationCode: '0000',
+          name: 'editor',
+        },
+      },
+      create: {
+        organizationCode: '0000',
+        name: 'editor',
+        abilities: {
+          connect: mutateAbilities,
+        },
+      },
+      update: {},
+    })
   } catch (error) {
     console.warn('Please define your seed data.')
     console.error(error)

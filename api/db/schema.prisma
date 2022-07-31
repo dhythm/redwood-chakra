@@ -73,7 +73,7 @@ model User {
 }
 
 enum Action {
-  quary
+  query
   mutate
 }
 
