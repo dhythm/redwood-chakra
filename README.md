@@ -34,3 +34,7 @@ yarn redwood generate page home /
 ```sh
 yarn redwood g layout main
 ```
+
+## Others
+Looks RedwoodJS has not supported multitenancy yet.
+https://github.com/redwoodjs/redwood/issues/5821
