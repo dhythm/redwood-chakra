@@ -1,4 +1,5 @@
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
+
 import { db } from './db'
 
 /**
@@ -19,10 +20,14 @@ import { db } from './db'
  * seen if someone were to open the Web Inspector in their browser.
  */
 export const getCurrentUser = async (session) => {
-  return await db.user.findUnique({
+  const currentUser = await db.user.findUnique({
     where: { id: session.id },
-    select: { id: true },
+    select: { id: true, role: { select: { name: true } } },
   })
+  // To make useAuth().hasRole() working
+  return currentUser
+    ? { id: currentUser.id, roles: [currentUser.role.name] }
+    : { roles: [] }
 }
 
 /**

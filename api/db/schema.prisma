@@ -16,7 +16,7 @@ model Ability {
   domain           Domain
   action           Action
   roles            Role[]
-  AbilitiesOnRoles AbilitiesOnRoles[]
+  abilitiesOnRoles AbilitiesOnRoles[]
 
   @@unique([name])
 }
@@ -29,7 +29,7 @@ model Role {
   name             String
   users            User[]
   abilities        Ability[]
-  AbilitiesOnRoles AbilitiesOnRoles[]
+  abilitiesOnRoles AbilitiesOnRoles[]
 
   @@unique([organizationCode, name])
 }
@@ -40,7 +40,6 @@ model AbilitiesOnRoles {
   ability    Ability  @relation(fields: [abilityId], references: [id])
   abilityId  String
   assignedAt DateTime @default(now())
-  // assignedBy String
 
   @@id([roleId, abilityId])
 }
@@ -66,7 +65,7 @@ model User {
   salt                String
   resetToken          String?
   resetTokenExpiresAt DateTime?
-  Role                Role?        @relation(fields: [roleId], references: [id])
+  role                Role?        @relation(fields: [roleId], references: [id])
   roleId              String?
 
   @@unique([email])

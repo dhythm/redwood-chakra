@@ -69,7 +69,7 @@ export default async () => {
         id: true,
       },
     })
-    await db.role.upsert({
+    const editorRole = await db.role.upsert({
       where: {
         organizationCode_name: {
           organizationCode: '0000',
@@ -97,6 +97,7 @@ export default async () => {
         email: 'kody@test.redwoodjs.com',
         hashedPassword,
         salt,
+        roleId: editorRole.id,
       },
       update: {},
     })
